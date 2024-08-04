@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><h3>STOP WATCH</h3>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: cursive, sans-serif;
+            background-color: pink;
+        }
+
+        #stopwatch {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            margin-bottom: 20px;
+        }
+
+        .buttons button {
+            margin: 0 5px;
+        }
+
+        #laps {
+            max-width: 300px;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="stopwatch">00:00:00</div>
+    <div class="buttons">
+        <button id="start" class="btn btn-success">Start</button>
+        <button id="pause" class="btn btn-warning">Pause</button>
+        <button id="reset" class="btn btn-danger">Reset</button>
+        <button id="lap" class="btn btn-info">Lap</button>
+    </div>
+    <ul id="laps" class="list-group"></ul>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let startTime, updatedTime, difference, timerInterval;
+            let running = false;
+            let laps = [];
+
+            function startStopwatch() {
+                if (!running) {
+                    startTime = new Date().getTime() - (difference || 0);
+                    timerInterval = setInterval(updateTime, 1000);
+                    running = true;
+                }
+            }
+
+            function pauseStopwatch() {
+                if (running) {
+                    clearInterval(timerInterval);
+                    difference = new Date().getTime() - startTime;
+                    running = false;
+                }
+            }
+
+            function resetStopwatch() {
+                clearInterval(timerInterval);
+                startTime = null;
+                difference = null;
+                running = false;
+                $('#stopwatch').text('00:00:00');
+                $('#laps').empty();
+                laps = [];
+            }
+
+            function updateTime() {
+                updatedTime = new Date().getTime();
+                difference = updatedTime - startTime;
+                let hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                $('#stopwatch').text(hours + ':' + minutes + ':' + seconds);
+            }
+
+            function recordLap() {
+                if (running) {
+                    const lapTime = $('#stopwatch').text();
+                    laps.push(lapTime);
+                    $('#laps').append('<li class="list-group-item">' + lapTime + '</li>');
+                }
+            }
+
+            $('#start').on('click', startStopwatch);
+            $('#pause').on('click', pauseStopwatch);
+            $('#reset').on('click', resetStopwatch);
+            $('#lap').on('click', recordLap);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
